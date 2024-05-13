@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Previsão do Tempo</title>
+</head>
+<body>
+    <h2>Consulte a Previsão do Tempo</h2>
+    <input type="text" id="cidadeInput" placeholder="Digite o nome da cidade">
+    <button id="buscarClimaBtn">Buscar Clima</button>
+    <div id="clima"></div>
+
+    <script>
+        function setClima(climaText) {
+            const climaContainer = document.getElementById('clima');
+            climaContainer.textContent = climaText;
+        }
+    
+        function fetchClima() {
+            const cidade = document.getElementById('cidadeInput').value;
+            const apiKey = '8743a87cc06f596d9faac49cd8c8a2b7'; // 
+    
+            if (!cidade) {
+                setClima('Por favor, digite o nome de uma cidade.');
+                return;
+            }
+    
+            // Quando a requisição fetch é concluída, ela retorna uma resposta (response). 
+            //O método .then() é usado para lidar com essa resposta. 
+            //A função response.json() é chamada para converter o corpo da resposta de formato JSON para um objeto JavaScript. 
+            //Isso também retorna uma promessa que é resolvida com o objeto JavaScript resultante.
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cidade}&appid=${apiKey}&units=metric&lang=pt_br`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod !== 200) {
+                        setClima('Cidade não encontrada.');
+                    } else {
+                        setClima(`Clima em ${data.name}, ${data.sys.country}: 
+                        ${data.weather[0].description}. Temperatura: ${data.main.temp}°C. Umidade: 
+                        ${data.main.humidity}%.`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Falha ao buscar informações do clima:', error);
+                    setClima('Erro ao carregar informações do clima.');
+                });
+        }
+    
+        document.getElementById('buscarClimaBtn').addEventListener('click', fetchClima);
+    
+        // Opcional: Adiciona um event listener para permitir a busca pressionando Enter
+        document.getElementById('cidadeInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                fetchClima();
+            }
+        });
+    </script>
+</body>
+</html>
